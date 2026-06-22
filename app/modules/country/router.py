@@ -13,13 +13,16 @@ router = APIRouter(prefix="/countries", tags=["Countries"])
 def create_country(country_in: CountryCreate, db: Session = Depends(get_db)):
     """Record a new country in database."""
     # Validación si ya existe el pais.
-    country_exist = db.query(CountryModel).filter(
-        CountryModel.country_code == country_in.country_code
+    country_exist = (
+        db.query(CountryModel)
+        .filter(CountryModel.country_code == country_in.country_code.upper())
+        .first()
     )
+
     if country_exist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"The country with code '{country_in.country_code}' already exist.",
+            detail=f"The country with code '{country_in.country_code.upper()}' already exist.",
         )
 
     # De modelo Pydantic a modelo SqlAlchemy

@@ -6,6 +6,7 @@ from app.core.database import base
 
 class CountryModel(base):
     __tablename__ = "country"
+    __table_args__ = {"schema": "holiday"}
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     country_name = Column(
