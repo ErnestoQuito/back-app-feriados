@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.core.database import engine, init_db
 from app.modules.country.router import router as country_router
+from app.modules.holiday.router import router as holiday_router
 from app.modules.token.router import router as auth_router
 
 VERSION = "0.1.0"
@@ -28,6 +29,7 @@ apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifesp
 
 apirest.include_router(auth_router)
 apirest.include_router(country_router)
+apirest.include_router(holiday_router)
 
 
 @apirest.get("/")

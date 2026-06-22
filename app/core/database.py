@@ -11,6 +11,7 @@ base = declarative_base()
 def init_db():
     """Importación local (Lazy Import) de todos los modelos del proyecto"""
     from app.modules.country.models import CountryModel  # noqa
+    from app.modules.holiday.models import HolidayModel  # noqa
 
     # Crea las tablas si o no existe (ideal para desarrollo inicial)
     base.metadata.create_all(bind=engine)

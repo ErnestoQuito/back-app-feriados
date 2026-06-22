@@ -1,4 +1,5 @@
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.core.database import base
@@ -22,4 +23,11 @@ class CountryModel(base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+    # Permite acceder a 'country.holidays' y obtener la lista de sus festividades
+    holiday = relationship(
+        "HolidayModel",
+        back_populates="country",
+        cascade="all, delete-orphan",
     )
