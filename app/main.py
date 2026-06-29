@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from app.core.database import engine, init_db
 from app.modules.country.router import router as country_router
@@ -30,6 +32,11 @@ apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifesp
 apirest.include_router(auth_router)
 apirest.include_router(country_router)
 apirest.include_router(holiday_router)
+
+
+@apirest.post("/token")
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    pass
 
 
 @apirest.get("/")

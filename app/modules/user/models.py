@@ -1,21 +1,23 @@
 import uuid
 
-from sqlalchemy import UUID, Column, DateTime, String
+from sqlalchemy import UUID, Boolean, Column, DateTime, String
 from sqlalchemy.sql import func
 
 from app.core.database import base
 
 
-class TokenBlackListModel(base):
-    __tablename__ = "token_blacklist"
+class UserModel(base):
+    __tablename__ = "user"
     __table_args__ = {"schema": "holiday"}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    jti = Column(String(255), nullable=False)
-    expires_at = Column(DateTime(timezone=True), nullable=False)
+    email = Column(String(50), nullable=False, unique=True)
+    password_hash = Column(String(255), nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    role = Column(String(50), nullable=False)
     created_at = Column(
         DateTime(timezone=True),
-        nullable=False,
+        nullable=True,
         server_default=func.now(),
     )
     updated_at = Column(
