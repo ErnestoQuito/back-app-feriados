@@ -1,10 +1,20 @@
+import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    user_id: str | None = None
 
 
 class UserDB(BaseModel):
-    email: str = Field(
+    email: EmailStr = Field(
         ...,
         min_length=2,
         max_length=255,
@@ -15,11 +25,11 @@ class UserDB(BaseModel):
 
 
 class UserCreate(UserDB):
-    password_hash: str
+    pass
 
 
 class UserResponse(UserDB):
-    id: str
+    id: uuid.UUID
     created_at: datetime
     updated_at: datetime
 
