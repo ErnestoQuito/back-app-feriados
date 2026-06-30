@@ -47,6 +47,7 @@ def create_root_user(
             email=email,
             password_hash=hashed_password,
             is_active=True,
+            role="admin",
         )
         db.add(new_user)
         db.commit()
