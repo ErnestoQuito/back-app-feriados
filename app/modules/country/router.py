@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -35,3 +37,10 @@ def create_country(country_in: CountryCreate, db: Session = Depends(get_db)):
     db.refresh(country_new)
 
     return country_new
+
+
+@router.get("/", response_model=List[CountryResponse], status_code=status.HTTP_200_OK)
+def list_country(db: Session = Depends(get_db)):
+    countries = db.query(CountryModel).all()
+
+    return countries

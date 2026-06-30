@@ -1,13 +1,11 @@
 from contextlib import asynccontextmanager
-from typing import Annotated
 
-from fastapi import Depends, FastAPI
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import FastAPI
 
 from app.core.database import engine, init_db
 from app.modules.country.router import router as country_router
 from app.modules.holiday.router import router as holiday_router
-from app.modules.token.router import router as auth_router
+from app.modules.user.router import router as auth_router
 
 VERSION = "0.1.0"
 
@@ -29,18 +27,11 @@ async def lifespan(app: FastAPI):
 
 apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifespan)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-apirest.include_router(auth_router)
 apirest.include_router(country_router)
 apirest.include_router(holiday_router)
-
-
-@apirest.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    pass
+apirest.include_router(auth_router)
 
 
 @apirest.get("/")
-async def root(token: Annotated[str, Depends(oauth2_scheme)]) -> dict:
+async def root() -> dict:
     return {"title": "Feriados Sudamerica"}
