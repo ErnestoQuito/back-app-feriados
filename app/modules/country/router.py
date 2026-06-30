@@ -1,9 +1,11 @@
-from typing import List
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.modules.user.dependencies import get_current_user
+from app.modules.user.models import UserModel
 
 from .models import CountryModel
 from .schemas import CountryCreate, CountryResponse
@@ -12,7 +14,11 @@ router = APIRouter(prefix="/countries", tags=["Countries"])
 
 
 @router.post("/", response_model=CountryResponse, status_code=status.HTTP_201_CREATED)
-def create_country(country_in: CountryCreate, db: Session = Depends(get_db)):
+def create_country(
+    country_in: CountryCreate,
+    current_user: Annotated[UserModel, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
     """Record a new country in database."""
     # Validación si ya existe el pais.
     country_exist = (
