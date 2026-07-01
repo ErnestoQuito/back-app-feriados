@@ -5,3 +5,4 @@ __pycache__/
 venv_*
 .DS_Store
 develop.env
+*.pem
