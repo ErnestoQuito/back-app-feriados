@@ -10,10 +10,12 @@ from app.modules.user.models import UserModel
 from .models import CountryModel
 from .schemas import CountryCreate, CountryResponse
 
-router = APIRouter(prefix="/countries", tags=["Countries"])
+router = APIRouter(prefix="/api/v1", tags=["Countries"])
 
 
-@router.post("/", response_model=CountryResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/countries", response_model=CountryResponse, status_code=status.HTTP_201_CREATED
+)
 def create_country(
     country_in: CountryCreate,
     current_user: Annotated[UserModel, Depends(get_current_user)],
@@ -45,7 +47,9 @@ def create_country(
     return country_new
 
 
-@router.get("/", response_model=List[CountryResponse], status_code=status.HTTP_200_OK)
+@router.get(
+    "/countries", response_model=List[CountryResponse], status_code=status.HTTP_200_OK
+)
 def list_country(db: Session = Depends(get_db)):
     countries = db.query(CountryModel).all()
 

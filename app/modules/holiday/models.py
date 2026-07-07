@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -13,6 +13,10 @@ class HolidayModel(base):
     holiday_date = Column(Date, nullable=False)
     holiday_name = Column(String(255), nullable=False)
     holiday_description = Column(String(512), nullable=True)
+    holiday_type = Column(String(50), nullable=True)
+    holiday_is_substitutable = Column(Boolean, nullable=True)
+    holiday_is_mandatory = Column(Boolean, nullable=True)
+    holiday_law_reference = Column(String(255), nullable=True)
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,

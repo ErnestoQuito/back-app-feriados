@@ -9,7 +9,7 @@ from app.core.security import create_access_token, verify_password
 from app.modules.user.models import UserModel
 from app.modules.user.schemas import Token
 
-router = APIRouter(prefix="/auth", tags=["Autenticación"])
+router = APIRouter(prefix="/api/v1/auth", tags=["Autenticación"])
 
 
 @router.post("/login", response_model=Token)

@@ -10,10 +10,12 @@ from app.modules.user.models import UserModel
 from .models import HolidayModel
 from .schemas import HolidayCreate, HolidayResponse
 
-router = APIRouter(prefix="/holidays", tags=["Holidays"])
+router = APIRouter(prefix="/api/v1", tags=["Holidays"])
 
 
-@router.post("/", response_model=HolidayResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/holidays", response_model=HolidayResponse, status_code=status.HTTP_201_CREATED
+)
 def create_holiday(
     holiday_in: HolidayCreate,
     current_user: Annotated[UserModel, Depends(get_current_user)],
@@ -23,7 +25,10 @@ def create_holiday(
     # Validar si existe el día festivo.
     holiday_exist = (
         db.query(HolidayModel)
-        .filter(HolidayModel.holiday_name == holiday_in.holiday_name)
+        .filter(
+            HolidayModel.holiday_name == holiday_in.holiday_name,
+            HolidayModel.holiday_date == holiday_in.holiday_date,
+        )
         .first()
     )
 
@@ -38,6 +43,10 @@ def create_holiday(
         holiday_date=holiday_in.holiday_date,
         holiday_name=holiday_in.holiday_name,
         holiday_description=holiday_in.holiday_description,
+        holiday_type=holiday_in.holiday_type,
+        holiday_is_substitutable=holiday_in.holiday_is_substitutable,
+        holiday_is_mandatory=holiday_in.holiday_is_mandatory,
+        holiday_law_reference=holiday_in.holiday_law_reference,
         id_country=holiday_in.id_country,
     )
     db.add(holiday_new)
@@ -45,3 +54,24 @@ def create_holiday(
     db.refresh(holiday_new)
 
     return holiday_new
+
+
+@router.get(
+    "/holidays/{id_country}",
+    response_model=list[HolidayResponse],
+    status_code=status.HTTP_200_OK,
+)
+def get_holidays_by_country(id_country: int, db: Session = Depends(get_db)):
+    holidays = (
+        db.query(HolidayModel)
+        .filter(HolidayModel.id_country == id_country)
+        .order_by(HolidayModel.holiday_date.asc())
+        .all()
+    )
+
+    if not holidays:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No se encontraron días festivos para el pais.",
+        )
+    return holidays

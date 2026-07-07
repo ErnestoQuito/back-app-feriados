@@ -16,6 +16,24 @@ class HolidayDB(BaseModel):
         max_length=512,
         description="Descripción del día festivo.",
     )
+    holiday_type: str | None = Field(
+        default=None,
+        max_length=50,
+        description="Tipo de día festivo.",
+    )
+    holiday_is_substitutable: bool | None = Field(
+        default=None,
+        description="Indica si el día festivo es sustituible.",
+    )
+    holiday_is_mandatory: bool | None = Field(
+        default=None,
+        description="Indica si el día festivo es obligatorio.",
+    )
+    holiday_law_reference: str | None = Field(
+        default=None,
+        max_length=255,
+        description="Referencia legal del día festivo.",
+    )
     id_country: int = Field(..., gt=0, description="ID del país.")
 
 

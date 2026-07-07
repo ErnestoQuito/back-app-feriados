@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import engine, init_db
 from app.modules.country.router import router as country_router
@@ -26,6 +27,15 @@ async def lifespan(app: FastAPI):
 
 
 apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifespan)
+
+ALLOWED_ORIGINS = ["http://localhost:5173", "http://192.168.31.231:5173"]
+apirest.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 
 apirest.include_router(country_router)
 apirest.include_router(holiday_router)
