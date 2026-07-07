@@ -1,7 +1,10 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
 
 from app.core.database import engine, init_db
 from app.modules.country.router import router as country_router
@@ -26,7 +29,34 @@ async def lifespan(app: FastAPI):
     print("..::[LIFESPAN] Servidor cerrando de manera segura.")
 
 
+def get_real_client_ip(request) -> str:
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "127.0.0.1"
+
+
+limiter = Limiter(key_func=get_real_client_ip)
+
 apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifespan)
+
+apirest.state.limiter = limiter
+
+
+def custom_rate_limit_handler(request: Request, exc: Exception) -> JSONResponse:
+    return JSONResponse(
+        status_code=429,
+        content={
+            "error": "Too Many Requests",
+            "message": "Has superado el límite de peticiones permitido. Por favor, espera un momento.",
+            "detail": str(
+                exc
+            ),  # Esto mantendrá el texto de slowapi (ej: "Rate limit exceeded: 5 per 1 minute")
+        },
+    )
+
+
+apirest.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 
 ALLOWED_ORIGINS = ["http://localhost:5173", "http://192.168.31.231:5173"]
 apirest.add_middleware(
@@ -43,5 +73,6 @@ apirest.include_router(auth_router)
 
 
 @apirest.get("/")
-async def root() -> dict:
-    return {"title": "Feriados Sudamerica"}
+@limiter.limit("20/minute")
+async def root(request: Request) -> dict:
+    return {"title": "Feriados Hub"}

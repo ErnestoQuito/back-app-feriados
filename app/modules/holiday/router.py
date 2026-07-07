@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.modules.user.dependencies import get_current_user
 from app.modules.user.models import UserModel
+from main import limiter
 
 from .models import HolidayModel
 from .schemas import HolidayCreate, HolidayResponse
@@ -61,6 +62,7 @@ def create_holiday(
     response_model=list[HolidayResponse],
     status_code=status.HTTP_200_OK,
 )
+@limiter.limit("20/minute")
 def get_holidays_by_country(id_country: int, db: Session = Depends(get_db)):
     holidays = (
         db.query(HolidayModel)

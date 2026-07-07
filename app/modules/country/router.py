@@ -1,11 +1,12 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.modules.user.dependencies import get_current_user
 from app.modules.user.models import UserModel
+from main import limiter
 
 from .models import CountryModel
 from .schemas import CountryCreate, CountryResponse
@@ -48,9 +49,12 @@ def create_country(
 
 
 @router.get(
-    "/countries", response_model=List[CountryResponse], status_code=status.HTTP_200_OK
+    "/countries",
+    response_model=List[CountryResponse],
+    status_code=status.HTTP_200_OK,
 )
-def list_country(db: Session = Depends(get_db)):
+@limiter.limit("20/minute")
+def list_country(request: Request, db: Session = Depends(get_db)):
     countries = db.query(CountryModel).all()
 
     return countries
