@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.limiter import limiter
 from app.modules.user.dependencies import get_current_user
 from app.modules.user.models import UserModel
-from main import limiter
 
 from .models import CountryModel
 from .schemas import CountryCreate, CountryResponse

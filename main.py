@@ -3,10 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 
 from app.core.database import engine, init_db
+from app.core.limiter import limiter
 from app.modules.country.router import router as country_router
 from app.modules.holiday.router import router as holiday_router
 from app.modules.user.router import router as auth_router
@@ -28,15 +28,6 @@ async def lifespan(app: FastAPI):
     engine.dispose()
     print("..::[LIFESPAN] Servidor cerrando de manera segura.")
 
-
-def get_real_client_ip(request) -> str:
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "127.0.0.1"
-
-
-limiter = Limiter(key_func=get_real_client_ip)
 
 apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifespan)
 
