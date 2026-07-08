@@ -29,6 +29,7 @@ def create_holiday(
         .filter(
             HolidayModel.holiday_name == holiday_in.holiday_name,
             HolidayModel.holiday_date == holiday_in.holiday_date,
+            HolidayModel.id_country == holiday_in.id_country,
         )
         .first()
     )
