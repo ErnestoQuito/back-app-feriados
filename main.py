@@ -63,7 +63,7 @@ def custom_rate_limit_handler(request: Request, exc: Exception) -> JSONResponse:
 
 apirest.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 
-ALLOWED_ORIGINS = ["http://localhost:5173", "http://192.168.31.231:5173"]
+ALLOWED_ORIGINS = ["http://localhost:5173", "http://192.168.31.231:5173", "https://front-app-feriados.vercel.app"]
 apirest.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
