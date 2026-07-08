@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
+import os
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from slowapi.errors import RateLimitExceeded
 
 from app.core.database import engine, init_db
@@ -30,6 +31,19 @@ async def lifespan(app: FastAPI):
 
 
 apirest = FastAPI(title="API HOLIDAY OF WORLD", version=VERSION, lifespan=lifespan)
+
+@apirest.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    # Obtiene la ruta absoluta del archivo en el contenedor
+    favicon_path = os.path.join(os.path.dirname(__file__), "favicon.ico")
+
+    # Si el archivo existe en el contenedor, lo sirve de inmediato
+    if os.path.exists(favicon_path):
+        return FileResponse(favicon_path)
+
+    # Resguardo en caso de que falle, para evitar el error 404 en los logs
+    from fastapi import Response
+    return Response(status_code=204)
 
 apirest.state.limiter = limiter
 
@@ -66,4 +80,14 @@ apirest.include_router(auth_router)
 @apirest.get("/")
 @limiter.limit("20/minute")
 async def root(request: Request) -> dict:
-    return {"title": "Feriados Hub"}
+    # Si la URL contiene parámetros de consulta (ej. ?rest_route=...), rechazamos la petición
+        if request.query_params:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Not Found"
+            )
+
+        return {
+            "message": "Feriados LATAM API activa",
+            "documentation": "/docs"
+        }
